@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import type { ResponseProductDto, AddProductDto, UpdateProductDto } from "../index";
-import { getProducts, createProduct, updateProduct, deleteProduct } from "../index";
+import { useEffect, useState } from 'react';
+import type { ResponseProductDto, AddProductDto, UpdateProductDto } from '../index';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../index';
 
 export function useProducts() {
   const [products, setProducts] = useState<ResponseProductDto[]>([]);
@@ -14,7 +14,7 @@ export function useProducts() {
       const data = await getProducts();
       setProducts(data);
     } catch (err) {
-      setError("Failed to fetch products");
+      setError('Failed to fetch products');
     } finally {
       setLoading(false);
     }
@@ -32,11 +32,11 @@ export function useProducts() {
         await fetchProducts();
         return { success: true };
       }
-      const errorMessage = "Failed to create product - Server returned false";
+      const errorMessage = 'Failed to create product - Server returned false';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to create product";
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create product';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     }
@@ -52,11 +52,11 @@ export function useProducts() {
         return { success: true };
       } 
       
-      const errorMessage = "Failed to update product - Server returned false";
+      const errorMessage = 'Failed to update product - Server returned false';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update product";
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update product';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     }
@@ -72,11 +72,11 @@ export function useProducts() {
         return { success: true };
       }
       
-      const errorMessage = "Failed to delete product - Server returned false";
+      const errorMessage = 'Failed to delete product - Server returned false';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete product";
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete product';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     }
