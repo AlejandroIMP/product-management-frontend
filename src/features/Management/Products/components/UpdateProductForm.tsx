@@ -370,10 +370,10 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
         </button>
         <button
           type="submit"
-          disabled={loading}
+          disabled={isDisabled}
           className="md:flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-500/50 transition-colors"
         >
-          {loading ? 'Updating...' : 'Save Changes'}
+          {isDisabled ? 'Updating...' : 'Save Changes'}
         </button>
       </div>
       <AlertModal
