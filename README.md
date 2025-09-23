@@ -1,69 +1,156 @@
-# React + TypeScript + Vite
+# Product Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern web application for managing products built with React, TypeScript, and Vite. This application provides a clean interface for creating, viewing, updating, and deleting products with image upload capabilities.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 📦 **Product Management**: Create, read, update, and delete products
+- 🖼️ **Image Upload**: Upload and manage product images
+- ✅ **Form Validation**: Client-side validation using Zod schema validation
+- 📱 **Responsive Design**: Mobile-friendly interface built with Tailwind CSS
+- 🔍 **Product Details**: Detailed product view with comprehensive information
+- ⚡ **Fast Performance**: Built with Vite for optimal development and build performance
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend Framework**: React 19
+- **Type Safety**: TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS 4
+- **Routing**: React Router 7
+- **Validation**: Zod
+- **Code Quality**: ESLint with TypeScript support
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Project Structure
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── features/
+│   └── Management/
+│       └── Products/
+│           ├── components/          # Product components
+│           │   ├── ui/             # Reusable UI components
+│           │   ├── CreateProductModal.tsx
+│           │   ├── ProductsList.tsx
+│           │   └── UpdateProductForm.tsx
+│           ├── hooks/              # Custom React hooks
+│           ├── services/           # API services
+│           ├── types/              # TypeScript type definitions
+│           ├── utils/              # Utility functions
+│           └── validation/         # Zod validation schemas
+├── Layouts/                        # Layout components
+├── pages/                          # Page components
+│   ├── products/
+│   └── NotFound/
+└── main.tsx                        # Application entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (version 18 or higher)
+- pnpm (recommended package manager)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd productManagement
+   ```
+
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+3. Start the development server:
+   ```bash
+   pnpm dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## Available Scripts
+
+- `pnpm dev` - Start the development server
+- `pnpm build` - Build the application for production
+- `pnpm lint` - Run ESLint for code quality checks
+- `pnpm preview` - Preview the production build locally
+
+## Key Components
+
+### Product Types
+
+The application uses TypeScript interfaces defined in [`src/features/Management/Products/types/product.types.ts`](src/features/Management/Products/types/product.types.ts):
+
+```typescript
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  createdAt: Date;
+  updatedAt: Date;
+  isActive: boolean;
+  image?: imageDto;
+}
 ```
+
+### Main Features
+
+- **Product List**: View all products in a responsive card layout ([`ProductsList`](src/features/Management/Products/components/ProductsList.tsx))
+- **Product Cards**: Individual product display with status indicators ([`Card`](src/features/Management/Products/components/ui/Card.tsx))
+- **Create Product**: Modal form for adding new products ([`CreateProductModal`](src/features/Management/Products/components/CreateProductModal.tsx))
+- **Product Validation**: Comprehensive form validation using Zod schemas
+
+### Validation
+
+The application includes robust form validation using Zod schemas defined in [`validation/product.validation.ts`](src/features/Management/Products/validation/product.validation.ts):
+
+- Name: Required, 1-100 characters
+- Description: Required, 1-255 characters  
+- Price: Minimum $0.01, positive numbers only
+- Stock: Non-negative integers
+- Image upload validation
+
+## Development Guidelines
+
+### Code Style
+
+This project uses ESLint with TypeScript support. The configuration is defined in [`eslint.config.js`](eslint.config.js) and follows modern React best practices.
+
+### TypeScript Configuration
+
+The project uses multiple TypeScript configurations:
+- [`tsconfig.json`](tsconfig.json) - Root configuration
+- [`tsconfig.app.json`](tsconfig.app.json) - Application-specific settings
+- `tsconfig.node.json` - Node.js specific settings
+
+## Building for Production
+
+To create a production build:
+
+```bash
+pnpm build
+```
+
+The built files will be available in the `dist` directory.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Make your changes and commit them: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature/new-feature`
+5. Submit a pull request
+
+## License
+
+This project is public, everyone can use it
+
+---
+
+Built with ❤️ using React, TypeScript, and Vite
