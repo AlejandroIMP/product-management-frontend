@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useProduct, UpdateProductForm, ConfirmationModal, useProducts } from '../index';
 import { useNavigate, useParams } from 'react-router';
+import { AlertModal } from './ui/AlertModal';
+import { useAlert } from '../hooks/useAlert';
 
 
 export function Product() {
@@ -8,6 +10,7 @@ export function Product() {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { alertModal, showError, showSuccess, closeAlert } = useAlert();
 
   if(!id){
     return(
@@ -55,14 +58,15 @@ export function Product() {
     try {
       const result = await deleteProduct(id);
       if (result.success) {
-        navigate('/'); // Redirect to products list
+        showSuccess('Deleted', 'Product deleted successfully.', () => {});
+        navigate('/'); 
       } else {
-        alert(result.error || 'Failed to delete product. Please try again.');
+        showError('Deletion Failed', result.error || 'Failed to delete product. Please try again.');
         setShowDeleteModal(false);
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('An error occurred while deleting the product.');
+      showError('Error', 'An error occurred while deleting the product.');
       setShowDeleteModal(false);
     } finally {
       setIsDeleting(false);
@@ -201,12 +205,19 @@ export function Product() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Product"
-        message={`Are you sure you want to delete "${product?.name}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
-        confirmButtonClass="bg-red-500 hover:bg-red-600"
+        title='Delete Product'
+        message={`Are you sure you want to delete '${product?.name}'? This action cannot be undone.`}
+        confirmText='Delete'
+        cancelText='Cancel'
+        confirmButtonClass='bg-red-500 hover:bg-red-600'
         isLoading={isDeleting}
+      />
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        type={alertModal.type}
+        title={alertModal.title}
+        message={alertModal.message}
+        onConfirm={closeAlert}
       />
     </div>
   );
