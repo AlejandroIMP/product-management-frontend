@@ -1,6 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { useProducts, useUploadImage } from '../index';
 import type { UpdateProductDto, ResponseProductDto } from '../index';
+import { AlertModal } from './ui/AlertModal';
+import { useAlert } from '../hooks/useAlert';
+import { updateProductSchema, validateUpdateProduct } from '../validation/product.validation';
 
 interface UpdateProductFormProps {
   product: ResponseProductDto;
@@ -13,6 +16,7 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
   const { upload, error } = useUploadImage();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { alertModal, showError, showSuccess, closeAlert } = useAlert();
   const [formData, setFormData] = useState<UpdateProductDto>({
     name: '',
     description: '',
@@ -21,6 +25,53 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
     isActive: true,
     imageId: undefined
   });
+
+
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
+
+
+  const validateField = (fieldName: string, value: unknown) => {
+    try {
+      const fieldSchema = updateProductSchema.shape[fieldName as keyof typeof updateProductSchema.shape];
+      if (fieldSchema) {
+        fieldSchema.parse(value);
+    
+        setValidationErrors(prev => {
+          const { [fieldName]: removed, ...rest } = prev;
+          return rest;
+        });
+        return true;
+      }
+    } catch (error: any) {
+      if (error.issues && error.issues[0]) {
+        setValidationErrors(prev => ({
+          ...prev,
+          [fieldName]: error.issues[0].message
+        }));
+      }
+      return false;
+    }
+    return true;
+  };
+
+  const validateForm = () => {
+    const result = validateUpdateProduct(formData);
+    
+    if (!result.success) {
+      const errors: { [key: string]: string } = {};
+      result.error.issues.forEach(issue => {
+        const path = issue.path[0] as string;
+        errors[path] = issue.message;
+      });
+      setValidationErrors(errors);
+      return false;
+    }
+    
+    setValidationErrors({});
+    return true;
+  };
 
   // Populate form with product data on mount
   useEffect(() => {
@@ -34,6 +85,9 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
         imageId: product.image?.id
       });
       
+      // Clear validation errors when loading new product data
+      setValidationErrors({});
+      
       // Set image preview if product has an image
       if (product.image?.url) {
         setImagePreview(product.image.url);
@@ -46,12 +100,12 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
 
     if (file) {
       if (!file.type.startsWith('image/')) {
-        alert('Please select a valid image file.');
+        showError('Invalid File Type', 'Please select a valid image file.');
         return;
       }
       
       if (file.size > 4 * 1024 * 1024) {
-        alert('Image size should be less than 4MB.');
+        showError('Invalid File Size', 'Image size should be less than 4MB.');
         return;
       }
 
@@ -74,7 +128,6 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
   };
 
   const handleCancel = () => {
-    // Reset form to original product values
     setFormData({
       name: product.name,
       description: product.description,
@@ -84,7 +137,8 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
       imageId: product.image?.id
     });
     
-    // Reset image preview
+    setValidationErrors({});
+    
     if (product.image?.url) {
       setImagePreview(product.image.url);
     } else {
@@ -100,9 +154,15 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      showError('Validation Error', 'Please correct the errors in the form before submitting.');
+      return;
+    }
+
     let imageId: string | undefined = formData.imageId;
 
-    // Upload new image if provided
+
     if (formData.image) {
       try {
         const response = await upload(formData.image);
@@ -110,12 +170,12 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
         if (response?.imageId) {
           imageId = response.imageId;
         } else {
-          alert(`Error uploading image: ${error || 'Unknown error'}. Please try again.`);
+          showError('Error uploading image', error || 'Unknown error. Please try again.');
           return; 
         }
       } catch (error) {
         console.error('Error uploading image:', error);
-        alert(`Error uploading image: ${error || 'Unknown error'}. Please try again.`);
+        showError('Error uploading image', error instanceof Error ? error.message : 'An unknown error occurred. Please try again.');
         return;
       }
     }
@@ -132,19 +192,20 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
     try {
       const result = await updateProduct(product.id, formDataToSubmit);
       if (result?.success) {
+        showSuccess('Success', 'Product updated successfully.', () => {});
         onSave();
       } else {
-        alert(result?.error || 'Failed to update product. Please try again.');
+        showError('Update Failed', result?.error || 'Failed to update product. Please try again.');
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('An error occurred while updating the product.');
+      showError('Update Error', 'An error occurred while updating the product.');
     } 
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Image Upload Section */}
+      
       <div>
         <label className="block text-sm font-medium mb-2">Product Image</label>
         <div className="space-y-2">
@@ -189,10 +250,22 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
         <input
           type="text"
           required
+          maxLength={100}
           value={formData.name || ''}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => {
+            const newValue = e.target.value;
+            setFormData({ ...formData, name: newValue });
+            validateField('name', newValue);
+          }}
+          className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
+            validationErrors.name 
+              ? 'border-red-500 focus:ring-red-500' 
+              : 'border-gray-300 focus:ring-blue-500'
+          }`}
         />
+        {validationErrors.name && (
+          <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+        )}
       </div>
 
       <div>
@@ -200,10 +273,23 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
         <textarea
           required
           rows={4}
+          maxLength={255}
           value={formData.description || ''}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => {
+            const newValue = e.target.value;
+            setFormData({ ...formData, description: newValue });
+            validateField('description', newValue);
+          }}
+          className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
+            validationErrors.description 
+              ? 'border-red-500 focus:ring-red-500' 
+              : 'border-gray-300 focus:ring-blue-500'
+          }`}
         />
+        {validationErrors.description && (
+          <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
+        )}
+        <p className="text-gray-500 text-xs mt-1">{(formData.description || '').length}/255 characters</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -212,12 +298,23 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
           <input
             type="number"
             required
-            min="0"
+            min="0.01"
             step="0.01"
-            value={formData.price || 0}
-            onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={formData.price || ''}
+            onChange={(e) => {
+              const newValue = parseFloat(e.target.value) || 0;
+              setFormData({ ...formData, price: newValue });
+              validateField('price', newValue);
+            }}
+            className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
+              validationErrors.price 
+                ? 'border-red-500 focus:ring-red-500' 
+                : 'border-gray-300 focus:ring-blue-500'
+            }`}
           />
+          {validationErrors.price && (
+            <p className="text-red-500 text-sm mt-1">{validationErrors.price}</p>
+          )}
         </div>
 
         <div>
@@ -226,10 +323,21 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
             type="number"
             required
             min="0"
-            value={formData.stock || 0}
-            onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) })}
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={formData.stock || ''}
+            onChange={(e) => {
+              const newValue = parseInt(e.target.value) || 0;
+              setFormData({ ...formData, stock: newValue });
+              validateField('stock', newValue);
+            }}
+            className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
+              validationErrors.stock 
+                ? 'border-red-500 focus:ring-red-500' 
+                : 'border-gray-300 focus:ring-blue-500'
+            }`}
           />
+          {validationErrors.stock && (
+            <p className="text-red-500 text-sm mt-1">{validationErrors.stock}</p>
+          )}
         </div>
       </div>
 
@@ -262,6 +370,13 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
           {loading ? 'Updating...' : 'Save Changes'}
         </button>
       </div>
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        type={alertModal.type}
+        title={alertModal.title}
+        message={alertModal.message}
+        onConfirm={closeAlert}
+      />
     </form>
   );
 }
