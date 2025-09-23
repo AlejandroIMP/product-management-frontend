@@ -1,19 +1,19 @@
-import type { ResponseProductDto, AddProductDto, UpdateProductDto } from "../index";
+import type { ResponseProductDto, AddProductDto, UpdateProductDto } from '../index';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function getProducts() {
   try {
     const res = await fetch(`${API_URL}/Product`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
     const data: ResponseProductDto[] = await res.json();
     return data;
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error('Error fetching products:', error);
     throw error;
   }
 }
@@ -24,7 +24,7 @@ export async function getProductById(id: string) {
     const data: ResponseProductDto = await res.json();
     return data;
   } catch (error) {
-    console.error("Error fetching product by ID:", error);
+    console.error('Error fetching product by ID:', error);
     throw error;
   }
 }
@@ -32,15 +32,15 @@ export async function getProductById(id: string) {
 export async function createProduct(product: AddProductDto) {
   try {
     const res = await fetch(`${API_URL}/Product`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(product),
     });
     return res;
   } catch (error) {
-    console.error("Error creating product:", error);
+    console.error('Error creating product:', error);
     throw error;
   }
 }
@@ -62,7 +62,7 @@ export async function updateProduct(id: string, product: UpdateProductDto) {
       formData.append('image', product.image);
 
       const res = await fetch(`${API_URL}/Product/${id}`, {
-        method: "PUT",
+        method: 'PUT',
         body: formData, // No incluir Content-Type header con FormData
       });
 
@@ -74,9 +74,9 @@ export async function updateProduct(id: string, product: UpdateProductDto) {
     } else {
       // Update without image - use JSON
       const res = await fetch(`${API_URL}/Product/${id}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: product.name,
@@ -95,7 +95,7 @@ export async function updateProduct(id: string, product: UpdateProductDto) {
       return res.ok;
     }
   } catch (error) {
-    console.error("Error updating product:", error);
+    console.error('Error updating product:', error);
     throw error;
   }
 }
@@ -103,7 +103,7 @@ export async function updateProduct(id: string, product: UpdateProductDto) {
 export async function deleteProduct(id: string) {
   try {
     const res = await fetch(`${API_URL}/Product/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
     
     if (!res.ok) {
@@ -112,7 +112,7 @@ export async function deleteProduct(id: string) {
     
     return res.ok;
   } catch (error) {
-    console.error("Error deleting product:", error);
+    console.error('Error deleting product:', error);
     throw error;
   }
 }
