@@ -17,6 +17,7 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { alertModal, showError, showSuccess, closeAlert } = useAlert();
+  const [isDisabled, setIsDisabled] = useState(false);
   const [formData, setFormData] = useState<UpdateProductDto>({
     name: '',
     description: '',
@@ -154,9 +155,11 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsDisabled(true);
 
     if (!validateForm()) {
       showError('Validation Error', 'Please correct the errors in the form before submitting.');
+      setIsDisabled(false);
       return;
     }
 
@@ -193,11 +196,14 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
       const result = await updateProduct(product.id, formDataToSubmit);
       if (result?.success) {
         showSuccess('Success', 'Product updated successfully.', () => {});
+        setIsDisabled(false);
         onSave();
       } else {
+        setIsDisabled(false);
         showError('Update Failed', result?.error || 'Failed to update product. Please try again.');
       }
     } catch (error) {
+      setIsDisabled(false);
       console.error('Error updating product:', error);
       showError('Update Error', 'An error occurred while updating the product.');
     } 

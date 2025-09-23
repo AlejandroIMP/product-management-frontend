@@ -18,6 +18,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { refreshProducts } = useProductsContext();
+  const [isDisabled, setIsDisabled] = useState(false);
   const [formData, setFormData] = useState<AddProductDto>({
     name: '',
     description: '',
@@ -121,7 +122,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsDisabled(true);
     if (!validateForm()) {
       showError('Validation Error', 'Please correct the errors in the form before submitting.');
       return;
@@ -163,9 +164,11 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
           refreshProducts();
           onClose();
           resetForm();
+          setIsDisabled(false);
         });
       } else {
         showError('Creation Failed', result?.error || 'Failed to create product. Please try again.');
+        setIsDisabled(false);
       }
     } catch (error) {
       console.error('Error creating product:', error);
@@ -350,10 +353,10 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
             </button>
             <button
               type='submit'
-              disabled={loading}
+              disabled={isDisabled}
               className='flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50'
             >
-              {loading ? 'Creating...' : 'Create Product'}
+              {isDisabled ? 'Creating...' : 'Create Product'}
             </button>
           </div>
         </form>
