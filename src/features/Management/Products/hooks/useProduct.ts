@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import type { ResponseProductDto } from "../index";
-import { getProductById } from "../index";
+import { useEffect, useState } from 'react';
+import type { ResponseProductDto } from '../index';
+import { getProductById } from '../index';
 
 export function useProduct(id: string) {
   const [product, setProduct] = useState<ResponseProductDto | null>(null);
@@ -16,7 +16,7 @@ export function useProduct(id: string) {
         const data = await getProductById(id);
         setProduct(data);
       } catch (err) {
-        setError("Failed to fetch product");
+        setError('Failed to fetch product');
       } finally {
         setLoading(false);
       }
@@ -36,7 +36,7 @@ export function useProduct(id: string) {
         setLoading(false);
       })
       .catch(() => {
-        setError("Failed to fetch product");
+        setError('Failed to fetch product');
         setLoading(false);
       });
   }
