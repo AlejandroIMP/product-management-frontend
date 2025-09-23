@@ -34,7 +34,6 @@ export function useAlert() {
     setAlertModal({ ...alertModal, isOpen: false });
   };
 
-  // Convenience methods for different alert types
   const showSuccess = (title: string, message: string, onConfirm?: () => void) => {
     showAlert('success', title, message, onConfirm);
   };

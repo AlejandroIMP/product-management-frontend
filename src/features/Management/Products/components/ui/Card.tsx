@@ -3,9 +3,11 @@ import type { ResponseProductDto } from '../../index';
 interface CardProps {
   product: ResponseProductDto;
   handleCardClick: () => void;
+  priority?: boolean;
+  loading?: 'eager' | 'lazy';
 }
 
-export function Card({ product, handleCardClick }: CardProps) {
+export function Card({ product, handleCardClick, priority, loading }: CardProps) {
   return (
     <div 
       key={product.id}
@@ -18,6 +20,8 @@ export function Card({ product, handleCardClick }: CardProps) {
           <img 
             src={product.image.url}
             alt={product.name}
+            fetchPriority={priority ? 'high' : 'low'}
+            loading={loading}
             className='w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105'
           />
         ) : (
@@ -31,7 +35,6 @@ export function Card({ product, handleCardClick }: CardProps) {
           </div>
         )}
         
-        {/* Status Badge - Positioned over image */}
         <div className='absolute top-4 right-4'>
           <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm ${
             product.isActive 
@@ -59,7 +62,7 @@ export function Card({ product, handleCardClick }: CardProps) {
         <div className='flex justify-between items-center mb-4'>
           <div className='flex items-baseline'>
             <span className='text-2xl font-bold text-gray-900'>
-              ${product.price}
+              Q{product.price}
             </span>
           </div>
           <div className='text-right'>

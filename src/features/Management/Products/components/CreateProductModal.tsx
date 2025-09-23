@@ -4,6 +4,7 @@ import type { AddProductDto } from '../index';
 import { AlertModal } from './ui/AlertModal';
 import { useAlert } from '../hooks/useAlert';
 import { addProductSchema, validateAddProduct } from '../validation/product.validation';
+import { useProductsContext } from '../context/ProductsContext';
 
 interface CreateProductModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
   const { alertModal, showWarning, showError, showSuccess, closeAlert } = useAlert();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { refreshProducts } = useProductsContext();
   const [formData, setFormData] = useState<AddProductDto>({
     name: '',
     description: '',
@@ -158,6 +160,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
       const result = await createProduct(formDataToSubmit);
       if (result?.success) {
         showSuccess('Success', 'Product created successfully. List will update automatically.', () => {
+          refreshProducts();
           onClose();
           resetForm();
         });
@@ -174,13 +177,13 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
 
     return (
     <>
-      <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+      <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
         <div className='bg-white rounded-lg p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto'>
           <div className='flex justify-between items-center mb-4'>
             <h2 className='text-xl font-semibold'>Create New Product</h2>
             <button 
               onClick={onClose}
-              className='text-gray-500 hover:text-gray-700'
+              className='text-gray-600 hover:text-gray-700'
               disabled={loading}
             >
               ✕

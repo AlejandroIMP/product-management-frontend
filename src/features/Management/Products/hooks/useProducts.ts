@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react';
 import type { ResponseProductDto, AddProductDto, UpdateProductDto } from '../index';
 import { getProducts, createProduct, updateProduct, deleteProduct } from '../index';
 
-export function useProducts() {
-  const [products, setProducts] = useState<ResponseProductDto[]>([]);
+export function useProducts(refreshKey?: number) {
+  const [products, setProducts] = useState<ResponseProductDto[]>(() => {
+    const cached = sessionStorage.getItem('products-cache');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,9 +23,37 @@ export function useProducts() {
     }
   }
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+    useEffect(() => {
+    const loadProducts = async () => {
+      // Cache strategy
+      const cacheKey = 'products-cache';
+      const cached = sessionStorage.getItem(cacheKey);
+      const cacheTimestamp = sessionStorage.getItem(cacheKey + '-timestamp');
+      
+      // Si el cache es reciente (< 5 minutos), usarlo primero
+      if (cached && cacheTimestamp && 
+          Date.now() - parseInt(cacheTimestamp) < 5 * 60 * 1000) {
+        setProducts(JSON.parse(cached));
+        setLoading(false);
+      }
+      
+      try {
+        const result = await getProducts();
+        if (result) {
+          setProducts(result);
+
+          sessionStorage.setItem(cacheKey, JSON.stringify(result));
+          sessionStorage.setItem(cacheKey + '-timestamp', Date.now().toString());
+        }
+      } catch (error) {
+        setError('Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProducts();
+  }, [refreshKey]);
 
   const addProduct = async (product: AddProductDto): Promise<{ success: boolean; error?: string }> => {
     try {

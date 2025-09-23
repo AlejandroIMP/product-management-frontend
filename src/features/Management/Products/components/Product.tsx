@@ -1,8 +1,13 @@
-import { useState } from 'react';
-import { useProduct, UpdateProductForm, ConfirmationModal, useProducts } from '../index';
+import { lazy, Suspense, useState } from 'react';
+import { useProduct, ConfirmationModal, useProducts } from '../index';
 import { useNavigate, useParams } from 'react-router';
-import { AlertModal } from './ui/AlertModal';
 import { useAlert } from '../hooks/useAlert';
+const AlertModal = lazy(() => import('./ui/AlertModal').then(module => ({
+  default: module.AlertModal
+})));
+const UpdateProductForm = lazy(() => import('./UpdateProductForm').then(module => ({
+  default: module.UpdateProductForm
+})));
 
 
 export function Product() {
@@ -128,12 +133,13 @@ export function Product() {
           </div>
 
           {isEditing ? (
-
-            <UpdateProductForm 
-              product={product}
-              onCancel={handleCancel}
-              onSave={handleSave}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <UpdateProductForm 
+                product={product}
+                onCancel={handleCancel}
+                onSave={handleSave}
+              />
+            </Suspense>
           ) : (
             <div>
               <div className='mb-6 w-full'>
@@ -141,6 +147,8 @@ export function Product() {
                   <img 
                     src={product.image.url} 
                     alt={product.name} 
+                    fetchPriority='high'
+                    loading='eager'
                     className='w-full h-64 object-cover rounded-lg'
                   />
                 ) : (
@@ -159,7 +167,7 @@ export function Product() {
                   <div className='space-y-3'>
                     <div className='flex justify-between py-2 border-b border-gray-100'>
                       <span className='text-gray-600'>Price:</span>
-                      <span className='font-semibold text-lg'>${product.price}</span>
+                      <span className='font-semibold text-lg'>Q{product.price}</span>
                     </div>
                     <div className='flex justify-between py-2 border-b border-gray-100'>
                       <span className='text-gray-600'>Stock:</span>
@@ -212,13 +220,17 @@ export function Product() {
         confirmButtonClass='bg-red-500 hover:bg-red-600'
         isLoading={isDeleting}
       />
-      <AlertModal
-        isOpen={alertModal.isOpen}
-        type={alertModal.type}
-        title={alertModal.title}
-        message={alertModal.message}
-        onConfirm={closeAlert}
-      />
+      {AlertModal && (
+        <Suspense fallback={null}>
+          <AlertModal
+            isOpen={alertModal.isOpen}
+            type={alertModal.type}
+            title={alertModal.title}
+            message={alertModal.message}
+            onConfirm={closeAlert}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -353,19 +353,19 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-4 pt-4 border-t">
+      <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
         <button
           type="button"
           onClick={handleCancel}
           disabled={loading}
-          className="flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          className="md:flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:border-gray-300/50 transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors"
+          className="md:flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-500/50 transition-colors"
         >
           {loading ? 'Updating...' : 'Save Changes'}
         </button>
