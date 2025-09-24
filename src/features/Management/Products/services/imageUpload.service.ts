@@ -5,7 +5,7 @@ export async function uploadImage(image: File) {
     const formData = new FormData();
     formData.append('image', image);
 
-    const res = await fetch(`/api/proxy/Image/upload`, {
+    const res = await fetch(`/api/proxy/api/Image/upload`, {
       method: 'POST',
       body: formData,
     });
