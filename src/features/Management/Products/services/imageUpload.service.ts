@@ -1,12 +1,11 @@
 import type { ImageUploadResponse } from '../types/image.dto.types';
-const API_URL = import.meta.env.VITE_API_URL;
 
 export async function uploadImage(image: File) {
   try {
     const formData = new FormData();
     formData.append('image', image);
 
-    const res = await fetch(`${API_URL}/Image/upload`, {
+    const res = await fetch(`/api/proxy/Image/upload`, {
       method: 'POST',
       body: formData,
     });

@@ -1,10 +1,8 @@
 import type { ResponseProductDto, AddProductDto, UpdateProductDto } from '../index';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export async function getProducts() {
   try {
-    const res = await fetch(`${API_URL}/Product`, {
+    const res = await fetch(`/api/proxy/Product`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -20,7 +18,7 @@ export async function getProducts() {
 
 export async function getProductById(id: string) {
   try {
-    const res = await fetch(`${API_URL}/Product/${id}`);
+    const res = await fetch(`/api/proxy/Product/${id}`);
     const data: ResponseProductDto = await res.json();
     return data;
   } catch (error) {
@@ -31,7 +29,7 @@ export async function getProductById(id: string) {
 
 export async function createProduct(product: AddProductDto) {
   try {
-    const res = await fetch(`${API_URL}/Product`, {
+    const res = await fetch(`/api/proxy/Product`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +59,7 @@ export async function updateProduct(id: string, product: UpdateProductDto) {
       // Append image
       formData.append('image', product.image);
 
-      const res = await fetch(`${API_URL}/Product/${id}`, {
+      const res = await fetch(`/api/proxy//Product/${id}`, {
         method: 'PUT',
         body: formData, // No incluir Content-Type header con FormData
       });
@@ -73,7 +71,7 @@ export async function updateProduct(id: string, product: UpdateProductDto) {
       return res.ok;
     } else {
       // Update without image - use JSON
-      const res = await fetch(`${API_URL}/Product/${id}`, {
+      const res = await fetch(`/api/proxy/Product/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +100,7 @@ export async function updateProduct(id: string, product: UpdateProductDto) {
 
 export async function deleteProduct(id: string) {
   try {
-    const res = await fetch(`${API_URL}/Product/${id}`, {
+    const res = await fetch(`/api/proxy/Product/${id}`, {
       method: 'DELETE',
     });
     
