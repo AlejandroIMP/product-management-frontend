@@ -174,11 +174,12 @@ export function UpdateProductForm({ product, onCancel, onSave }: UpdateProductFo
           imageId = response.imageId;
         } else {
           showError('Error uploading image', error || 'Unknown error. Please try again.');
+          setIsDisabled(false);
           return; 
         }
       } catch (error) {
-        console.error('Error uploading image:', error);
         showError('Error uploading image', error instanceof Error ? error.message : 'An unknown error occurred. Please try again.');
+        setIsDisabled(false);
         return;
       }
     }

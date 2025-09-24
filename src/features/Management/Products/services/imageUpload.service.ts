@@ -1,5 +1,5 @@
 import type { ImageUploadResponse } from '../types/image.dto.types';
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_DEVELOPMENT_API_URL;
 
 export async function uploadImage(image: File) {
   try {
