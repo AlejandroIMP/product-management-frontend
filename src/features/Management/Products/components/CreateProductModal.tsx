@@ -137,6 +137,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
           imageId = response.imageId;
         } else {
           showError('Upload Failed', `Error uploading image: ${error || 'Unknown error'}. Please try again.`);
+          setIsDisabled(false);
           return; 
         }
       } catch (error) {
