@@ -141,6 +141,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
         }
       } catch (error) {
         console.error('Error uploading image:', error);
+        setIsDisabled(false);
         showError('Upload Failed', `Error uploading image: ${error || 'Unknown error'}. Please try again.`);
         return;
       }
