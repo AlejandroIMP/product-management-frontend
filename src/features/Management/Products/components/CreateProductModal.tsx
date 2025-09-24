@@ -125,6 +125,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
     setIsDisabled(true);
     if (!validateForm()) {
       showError('Validation Error', 'Please correct the errors in the form before submitting.');
+      setIsDisabled(false);
       return;
     }
 
@@ -173,7 +174,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
         setIsDisabled(false);
       }
     } catch (error) {
-      console.error('Error creating product:', error);
+      setIsDisabled(false);
       showError('Error', 'An error occurred while creating the product.');
     } 
   };
