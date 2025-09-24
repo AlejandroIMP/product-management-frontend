@@ -8,7 +8,9 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  const targetUrl = `${process.env.VITE_API_URL}${req.url.replace('/api/proxy', '')}`;
+  const baseUrl = process.env.API_URL || process.env.VITE_API_URL || 'http://your-api.somee.com';
+  const targetUrl = `${baseUrl}${req.url.replace('/api/proxy', '')}`;
+
 
   try {
    

@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/proxy.js": {
+    "api/proxy.mjs": {
       "maxDuration": 30
     }
   },
