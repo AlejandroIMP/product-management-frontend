@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from 'react';
 import { useProduct, ConfirmationModal, useProducts } from '../index';
 import { useNavigate, useParams } from 'react-router';
 import { useAlert } from '../hooks/useAlert';
+import { useProductsContext } from '../context/ProductsContext';
 const AlertModal = lazy(() => import('./ui/AlertModal').then(module => ({
   default: module.AlertModal
 })));
@@ -32,7 +33,8 @@ export function Product() {
   }
 
   const navigate = useNavigate();
-  const { product, loading, error } = useProduct(id);
+  const { refreshProducts, refreshKey } = useProductsContext();
+  const { product, loading, error } = useProduct(id, refreshKey);
   const { deleteProduct } = useProducts();
 
   const handleEdit = () => {
@@ -45,7 +47,7 @@ export function Product() {
 
   const handleSave = () => {
     setIsEditing(false);
-    // El componente se re-renderizará automáticamente con los nuevos datos
+    refreshProducts(); // Forzar actualización del producto
   };
 
   const handleDeleteClick = () => {
@@ -63,6 +65,7 @@ export function Product() {
     try {
       const result = await deleteProduct(id);
       if (result.success) {
+        refreshProducts(); // Actualizar el contexto
         showSuccess('Deleted', 'Product deleted successfully.', () => {});
         navigate('/'); 
       } else {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ResponseProductDto } from '../index';
 import { getProductById } from '../index';
 
-export function useProduct(id: string) {
+export function useProduct(id: string, refreshKey?: number) {
   const [product, setProduct] = useState<ResponseProductDto | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export function useProduct(id: string) {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, refreshKey]);
 
   const handleRetry = () => {
     setLoading(true);
