@@ -11,13 +11,7 @@ export default defineConfig({
         '/api/proxy': {
           target: process.env.VITE_API_URL || 'https://your-api.somee.com',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/proxy/, ''),
-          configure: (proxy, options) => {
-            // Log proxy requests
-            proxy.on('proxyReq', (proxyReq, req, res) => {
-              
-            });
-          }
+          rewrite: (path) => path.replace(/^\/api\/proxy/, '')
         }
       }
     },
