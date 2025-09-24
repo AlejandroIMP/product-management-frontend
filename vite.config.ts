@@ -5,6 +5,22 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+
+  server: {
+      proxy: {
+        '/api/proxy': {
+          target: process.env.VITE_API_URL || 'https://your-api.somee.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/proxy/, ''),
+          configure: (proxy, options) => {
+            // Log proxy requests
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              
+            });
+          }
+        }
+      }
+    },
   build: {
     rollupOptions: {
       output: {
